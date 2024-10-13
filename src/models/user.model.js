@@ -55,22 +55,20 @@ const userSchema = new Schema(
   { timestamps: true }
 );
 
-
 userSchema.pre("save", async function (next) {
-  console.log("Started IN DB PRE SAVE")
+  console.log("Started IN DB PRE SAVE");
   if (!this.isModified("password")) return next();
   this.password = await bcrypt.hash(this.password, 10);
   next();
 });
-
-
 
 userSchema.methods.isPasswordCorrect = async function (password) {
   return await bcrypt.compare(password, this.password);
 };
 
 userSchema.methods.generateAccessToken = async function () {
-  return await jwt.sign(
+  console.log("You are in the access world!")
+  return jwt.sign(
     {
       _id: this._id,
       userName: this.userName,
@@ -85,7 +83,7 @@ userSchema.methods.generateAccessToken = async function () {
 };
 
 userSchema.methods.generateRefreshToken = async function () {
-  return await jwt.sign(
+  return jwt.sign(
     {
       _id: this._id,
     },
