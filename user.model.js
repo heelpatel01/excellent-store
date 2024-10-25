@@ -1,73 +1,58 @@
 import { Schema, model } from "mongoose";
-import bcrypt from "bcrypt"
 import jwt from "jsonwebtoken";
+import bcrypt from "bcrypt";
 
 const userSchema = new Schema(
   {
     userName: {
       type: String,
       required: true,
+      index: true,
+      unique: true,
+      lowercase: true,
+      trim: true,
     },
     email: {
       type: String,
       required: true,
+      unique: true,
+      lowercase: true,
+      trim: true,
     },
-    storeName: {
+    fullName: {
       type: String,
       required: true,
+      index: true,
+      lowercase: true,
+      trim: true,
     },
+    avatar: {
+      //Will Come URL From Cloudinary
+      required: true,
+      type: String,
+    },
+    coverImage: {
+      type: String,
+    },
+
     password: {
       type: String,
-      required: true,
+      required: [true, "Password is required"],
     },
-    likedProducts: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: "Product",
-      },
-    ],
-    orders: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: "Order",
-      },
-    ],
-    comments: [
-      {
-        productId: {
-          type: Schema.Types.ObjectId,
-          ref: "Product",
-        },
-        content: String,
-      },
-    ],
-    ratings: [
-      {
-        productId: {
-          type: Schema.Types.ObjectId,
-          ref: "Product",
-        },
-        rating: String,
-      },
-    ],
 
-    avatar: {
+    refreshToken: {
       type: String,
-      default: "defaultProfilePic.jpg",
-    },
-    productsPosted: {
-      type: Schema.Types.ObjectId,
-      ref: "Product",
     },
 
-    cart: {
-      type: Schema.Types.ObjectId,
-      ref: "Cart",
-    },
+    //ITS NOT COMMON YOU HAVE TO REMOVE IT BUT FOR VIDEO PURPOSE IM WRITING!
+    watchHistory: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Video",
+      },
+    ],
   },
-  {
-    timestamps: true,
-  }
+  { timestamps: true }
 );
 
 userSchema.pre("save", async function (next) {
@@ -82,13 +67,13 @@ userSchema.methods.isPasswordCorrect = async function (password) {
 };
 
 userSchema.methods.generateAccessToken = async function () {
-  console.log("You are in the access token world!");
+  console.log("You are in the access world!");
   return jwt.sign(
     {
       _id: this._id,
       userName: this.userName,
       email: this.email,
-      storeName: this.storeName,
+      fullName: this.fullName,
     },
     process.env.ACCESS_TOKEN_SECRET,
     {
@@ -110,4 +95,3 @@ userSchema.methods.generateRefreshToken = async function () {
 };
 
 export const User = model("User", userSchema);
-
