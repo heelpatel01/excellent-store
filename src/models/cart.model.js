@@ -4,12 +4,31 @@ const cartSchema = new Schema({
   userId: {
     type: Schema.Types.ObjectId,
     ref: "User",
+    required: true,
   },
   items: [
     {
-      productId: Schema.Types.ObjectId,
-      ref: "Product",
-      price: { type: Number, require: true },
+      productId: {
+        type: Schema.Types.ObjectId,
+        ref: "Product",
+        required: true,
+      },
+      productPrice: {
+        type: Number,
+        required: true,
+      }, // Original price of the product
+      price: {
+        type: Number,
+        required: true,
+      }, // Total price based on quantity
+      quantity: {
+        type: Number,
+        required: true,
+        default: 1,
+      },
+      image: {
+        type: String,
+      },
     },
   ],
   totalQuantity: {
@@ -25,4 +44,3 @@ const cartSchema = new Schema({
 });
 
 export const Cart = model("Cart", cartSchema);
-
