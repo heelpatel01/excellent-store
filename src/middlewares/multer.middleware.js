@@ -9,4 +9,5 @@ const storage = multer.diskStorage({
   },
 });
 
+export const uploadMultiple=multer({storage}).array('images',5)
 export const upload = multer({ storage });

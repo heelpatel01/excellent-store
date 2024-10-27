@@ -22,4 +22,21 @@ const uploadOnCloudinary = async (localFilePath) => {
   }
 };
 
-export { uploadOnCloudinary };
+
+const uploadMultipleOnCloudinary = async (localFilePaths) => {
+  const uploadPromises = localFilePaths.map((filePath) =>
+    uploadOnCloudinary(filePath)
+  );
+
+  const uploadResults = await Promise.all(uploadPromises);
+
+  // Remove any null responses due to failed uploads
+  const successfulUploads = uploadResults
+    .filter((result) => result !== null)
+    .map((result) => result.secure_url);
+
+  return successfulUploads;
+};
+
+
+export { uploadOnCloudinary,uploadMultipleOnCloudinary };

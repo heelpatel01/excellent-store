@@ -1,5 +1,5 @@
 import { Schema, model } from "mongoose";
-import bcrypt from "bcrypt"
+import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
 const userSchema = new Schema(
@@ -55,10 +55,12 @@ const userSchema = new Schema(
       type: String,
       default: "defaultProfilePic.jpg",
     },
-    productsPosted: {
-      type: Schema.Types.ObjectId,
-      ref: "Product",
-    },
+    productsPosted: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Product",
+      },
+    ],
 
     cart: {
       type: Schema.Types.ObjectId,
@@ -110,4 +112,3 @@ userSchema.methods.generateRefreshToken = async function () {
 };
 
 export const User = model("User", userSchema);
-

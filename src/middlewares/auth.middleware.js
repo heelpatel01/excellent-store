@@ -3,13 +3,11 @@ import jwt from "jsonwebtoken";
 import { asyncRequestHandler } from "../utils/asyncHandler.js";
 import { User } from "../models/user.model.js";
 
-export const verifyJWT = asyncRequestHandler(async (req, res,next) => {
+export const verifyJWT = asyncRequestHandler(async (req, res, next) => {
   try {
     const accessToken =
       req.cookies?.accessToken ||
       req.header("Authorization")?.replace("Bearer", "");
-
-      
 
     const token = jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET);
 
@@ -21,9 +19,7 @@ export const verifyJWT = asyncRequestHandler(async (req, res,next) => {
       throw new ApiError(404, "User Not Found");
     }
 
-    
     req.user = user;
-
 
     next();
   } catch (error) {

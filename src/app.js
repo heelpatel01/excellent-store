@@ -17,12 +17,14 @@ app.use(express.static("public"));
 app.use(cookieParser());
 
 //Routes import
-import useRouter from "./routes/user.routes.js";
+import userRouter from "./routes/user.routes.js";
+import producRouter from "./routes/product.routes.js";
 
 //router declaration
 app.get("/test", (req, res) => {
   return res.send("cool");
 });
-app.use("/api/v1/users", useRouter);
+app.use("/api/v1/users", userRouter);
+app.use("/api/v1/products", producRouter);
 
 export { app };

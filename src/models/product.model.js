@@ -7,12 +7,15 @@ const productSchema = new Schema({
     required: true,
   },
   images: [String], //add 5 images limit
-  title: { type: String, required: true },
+  title: {
+    type: String,
+    required: true,
+  },
   description: { type: String, required: true },
   ratings: { type: Number, default: 0 },
   comments: [
     {
-      userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+      userId: { type: Schema.Types.ObjectId, ref: "User" },
       content: String,
     },
   ],
@@ -25,12 +28,12 @@ const productSchema = new Schema({
     required: true,
   },
   postedBy: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: Schema.Types.ObjectId,
     ref: "User",
   },
   purchasedBy: [
     {
-      type: mongoose.Schema.Types.ObjectId,
+      type: Schema.Types.ObjectId,
       ref: "User",
     },
   ],
@@ -49,6 +52,4 @@ const productSchema = new Schema({
   ], // Add categories for products
 });
 
-const Product = model("Product", productSchema);
-
-module.exports = Product;
+export const Product = model("Product", productSchema);
