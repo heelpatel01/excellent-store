@@ -100,4 +100,87 @@ const handleShowCart = asyncRequestHandler(async (req, res) => {
   }
 });
 
-export { handleAddToCart, handleShowCart };
+// Update product quantity in cart
+const handleUpdateCartItem = asyncRequestHandler(async (req, res) => {
+  const { productId, quantity } = req.body;
+
+  if (!productId || quantity < 0) {
+    throw new ApiError(400, "Product ID and valid quantity are required.");
+  }
+
+  const cart = await Cart.findOne({ userId: req.user._id });
+  if (!cart) {
+    throw new ApiError(404, "Cart not found for user.");
+  }
+
+  const item = cart.items.find((item) => item.productId.equals(productId));
+  if (!item) {
+    throw new ApiError(404, "Product not found in cart.");
+  }
+
+  if (quantity === 0) {
+    cart.items = cart.items.filter((item) => !item.productId.equals(productId));
+  } else {
+    item.quantity = quantity;
+    item.price = item.productPrice * quantity; // Update price based on new quantity
+  }
+
+  cart.totalQuantity = cart.items.reduce((sum, item) => sum + item.quantity, 0);
+  cart.totalPrice = cart.items.reduce((sum, item) => sum + item.price, 0);
+
+  await cart.save();
+  return res
+    .status(200)
+    .json(new ApiResponse(200, cart, "Cart item updated successfully"));
+});
+
+// Clear all products from cart
+const handleClearAllProducts = asyncRequestHandler(async (req, res) => {
+  const cart = await Cart.findOneAndUpdate(
+    { userId: req.user._id },
+    { items: [], totalQuantity: 0, totalPrice: 0 },
+    { new: true }
+  );
+
+  if (!cart) {
+    throw new ApiError(404, "Cart not found for user.");
+  }
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, cart, "All products cleared from cart"));
+});
+
+// Delete a single product from cart
+const handleDeleteOneProduct = asyncRequestHandler(async (req, res) => {
+  const { productId } = req.body;
+
+  if (!productId) {
+    throw new ApiError(400, "Product ID is required.");
+  }
+
+  const cart = await Cart.findOne({ userId: req.user._id });
+  if (!cart) {
+    throw new ApiError(404, "Cart not found for user.");
+  }
+
+  const itemIndex = cart.items.findIndex((item) =>
+    item.productId.equals(productId)
+  );
+  if (itemIndex === -1) {
+    throw new ApiError(404, "Product not found in cart.");
+  }
+
+  const [removedItem] = cart.items.splice(itemIndex, 1);
+
+  cart.totalQuantity -= removedItem.quantity;
+  cart.totalPrice -= removedItem.price;
+
+  await cart.save();
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, cart, "Product removed from cart successfully"));
+});
+
+export { handleAddToCart, handleShowCart ,handleClearAllProducts,handleDeleteOneProduct};
